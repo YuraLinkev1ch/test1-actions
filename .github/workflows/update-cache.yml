@@ -1,0 +1,33 @@
+name: Update GitHub Pages Cache
+
+on:
+  push:
+    branches:
+      - main  # или ваша основная ветка (например, gh-pages)
+
+jobs:
+  update_cache:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Generate new script version
+      run: |
+        TIMESTAMP=$(date +%s)
+
+        mv index.js index-${TIMESTAMP}.js
+
+        # Настроим Git для коммита
+        git config --global user.name "YuraLinkev1ch"
+        git config --global user.email "yura.linkevich2012@gmail.com"
+
+        git add index-${TIMESTAMP}.js
+        git commit -m "Update script to version ${TIMESTAMP}"
+
+    - name: Push changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Используем автоматический токен для пуша
+      run: |
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }} 
